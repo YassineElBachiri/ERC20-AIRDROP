@@ -92,4 +92,27 @@ describe("YEBERC20 Tests", function(){
       assert(balance === expectedBalance)
     })
   })
+
+  // Set Merkle Root
+  describe('setMerkleRoot', function() {
+    it('should NOT set the merkle root if the caller is NOT the owner', async function() {
+      const { contract, merkleTree, owner, addr1, addr2 } = await loadFixture(deployContractFixture);
+
+      await expect(contract.connect(addr1).setMerkleRoot(merkleTree.root)).to.be.revertedWithCustomError(
+        contract,
+        'OwnableUnauthorizedAccount'
+      ).withArgs(
+        addr1.address
+      )
+    })
+
+    it('should set the merkle root if the caller is the owner', async function() {
+      const { contract, merkleTree, owner, addr1, addr2 } = await loadFixture(deployContractFixture);
+      let newMerkleRoot = "0xd1000e3d5650743475aa0addfeef7e36cbfc4e060939615f4c3651e4b529d61c";
+      await contract.setMerkleRoot(newMerkleRoot);
+
+      let contractMerkleRoot = await contract.merkleRoot()
+      assert(newMerkleRoot === contractMerkleRoot);
+    })
+  })
 })
