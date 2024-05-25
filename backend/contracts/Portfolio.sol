@@ -36,7 +36,7 @@ contract Portfolio{
   uint projectCount;
   uint educationCount;
   uint experienceCount;
-  address public manager = 0xe4476Ca098Fa209ea457c390BB24A8cfe90FCac4;
+  address public manager;
 
   constructor(){
     manager = msg.sender;
@@ -107,8 +107,8 @@ contract Portfolio{
         imageLink = _imageLink;
   }
 
-  function donate() public payable{
-    payable(manager).transfer(msg.value);
+  function donate(uint256 amount) public payable{
+    payable(manager).transfer(amount);
 
   }
 

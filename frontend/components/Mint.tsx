@@ -1,94 +1,55 @@
-'use client'
-// ReactJS
-import { useState, useEffect } from "react"
+import { useState } from "react";
+import { Flex, Text, Button, useToast } from "@chakra-ui/react";
+import { useAccount, useWriteContract } from "wagmi";
+import { contractAddress, contractAbi } from "@/constants";
+import { formatEther } from "viem"; // Corrected import
 
-// ChakraUI
-import { Flex, Text, Button, Spinner, useToast, Alert, AlertIcon } from "@chakra-ui/react"
-
-// Wagmi
-import { useAccount, useReadContract, type BaseError, useWriteContract, useWaitForTransactionReceipt } from "wagmi"
-
-// Contract informations
-import { contractAddress, contractAbi } from "@/constants"
-
-// Viem
-import { formatEther } from "viem"
-
-
-// Layout
-import Layout from "./Layout"
-import { error } from "console"
-
-const Mint = () => {
-
-  const { address } = useAccount()
+const Donate = () => {
+  const { address } = useAccount();
   const toast = useToast();
 
-  // Get the total amount of the YEB tokens airdroppped
-  const { data: totalSupply, isLoading: totalSupplyLoading, refetch: refetchTotalSupply } = useReadContract({
-    address: contractAddress,
-    abi: contractAbi,
-    functionName: 'totalSupply',
-    account: address
-  })
+  const { isPending, writeContract } = useWriteContract(); // Removed unused variables
 
-  const formatTotalSupply = (supply: bigint | undefined) => {
-    if (supply !== undefined) {
-      return formatEther(supply);
-    }
-    return "0";
+  const donate = async () => {
+    try {
+        // Assuming you want to send 1 ETH, adjust the argument accordingly
+        await writeContract({
+          address: contractAddress,
+          abi: contractAbi,
+          functionName: 'donate',
+          account: address,
+          args: [1], // Uncommented and adjusted for demonstration
+        });
+        toast({
+          title: "Donation successful.",
+          description: "Your donation has been processed.",
+          status: "success",
+          duration: 5000,
+          isClosable: true,
+        });
+      } catch (error) {
+        console.error("Donation failed:", error);
+        toast({
+          title: "Donation failed.",
+          description: "An error occurred during the donation process.",
+          status: "error",
+          duration: 5000,
+          isClosable: true,
+        });
+      }
   };
 
-  const { data: hash, error: airdropError, isPending, writeContract } = useWriteContract() 
-
-  const getAirdrop = async() => {
-    writeContract({
-      address: contractAddress,
-      abi: contractAbi,
-      functionName: 'donate',
-      account: address,
-      args: [address]
-    });
-  }
-
-  const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({ 
-    hash, 
-  })
-
-  useEffect(() => {
-    isConfirmed && refetchTotalSupply();
-  }, [isConfirmed])
-
- 
-
   return (
-    <Flex
-      direction="column"
-      width={['100%', '100%', '50%', '50%']}
-    >
-      {totalSupplyLoading ? (
-        <Flex justifyContent="center">
-          <Spinner
-            thickness='4px'
-            speed='0.65s'
-            emptyColor='gray.200'
-            color='blue.500'
-            size='xl'
-          />
-        </Flex>
-      ) : (
-        <>
-          <Flex justifyContent="center">
-            <Text mt="1rem">Amount Airdrop given : <Text as='b'>{formatTotalSupply(totalSupply as bigint | undefined)} YEB</Text></Text>
-          </Flex>
-         
-          
-           
-              <Button onClick={() => getAirdrop()} mt="1rem">{isPending ? 'Minting...' : 'Mint'}</Button>
-            </>
-          )}
+    <Flex direction="column" width={['100%', '100%', '50%', '50%']}>
+      <Flex justifyContent="center">
+        <Text mt="1rem">Donate to the Manager:</Text>
+      </Flex>
+      
+      <Button onClick={donate} mt="1rem" isLoading={isPending}>
+        Donate 1 ETH
+      </Button>
     </Flex>
-  )
-}
+  );
+};
 
-export default Mint
+export default Donate;

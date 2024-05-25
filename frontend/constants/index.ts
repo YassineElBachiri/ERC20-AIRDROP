@@ -1,5 +1,5 @@
 export const contractAddress =  "0x5FbDB2315678afecb367f032d93F642f64180aa3"
-export const contractAbi =  [
+export const contractAbi = [
   {
     "inputs": [],
     "stateMutability": "nonpayable",
@@ -277,7 +277,13 @@ export const contractAbi =  [
     "type": "function"
   },
   {
-    "inputs": [],
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      }
+    ],
     "name": "donate",
     "outputs": [],
     "stateMutability": "payable",
