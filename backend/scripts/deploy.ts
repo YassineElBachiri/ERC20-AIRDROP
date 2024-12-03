@@ -1,29 +1,23 @@
 import {ethers} from "hardhat";
 
 // Types
-import { YEBERC20 } from "../typechain-types";
-import { StandardMerkleTree } from "@openzeppelin/merkle-tree";
+import { Portfolio } from "../typechain-types";
 
-
-// WhiteListed
-import { whiteListed } from "../utils/whiteListed";
 
 
 async function main() {
 
-    let contract: YEBERC20;
-    let merkleTree: StandardMerkleTree<string[]>
+    let contract: Portfolio;
 
-    merkleTree = StandardMerkleTree.of(whiteListed,["address"], {sortLeaves: true});
 
     const [owner] =  await ethers.getSigners();
-    contract = await ethers.deployContract("YEBERC20", [owner.address, merkleTree.root]);
+    contract = await ethers.deployContract("Portfolio");
 
     await contract.waitForDeployment();
 
 
     console.log(
-        `YEBERC20 deployed to ${contract.target} with merkleRoot ${merkleTree.root}`
+        `Portfolio deployed to ${contract.target}`
       );
 
 }
